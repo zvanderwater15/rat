@@ -44,6 +44,7 @@ loader.load( '/rat/rat.glb', function ( gltf ) {
     mixer = new THREE.AnimationMixer( model );
     const animations = ["idle", "walk", "attack", "hit"];
     mixer.clipAction( gltf.animations[ 0 ] ).play();
+    mixer.timeScale = 4/5 ;
     animate();
 }, undefined, function ( error ) {
 	console.error( error );
