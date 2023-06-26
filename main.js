@@ -8,9 +8,14 @@ let ratContainerWidth = ratContainer.offsetWidth;
 let ratContainerHeight = window.innerHeight - (headerHeight * 2);
 
 console.log(ratContainerHeight);
+
+const renderer = new THREE.WebGLRenderer({ alpha: true });
+renderer.setClearColor( 0x000000, 0 ); // the default
+renderer.setSize( ratContainerWidth, ratContainerHeight );
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
 //scene
 const scene = new THREE.Scene();
-scene.background = new THREE.Color( 0x000000 );
 const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d );
 hemiLight.position.set( 0, 20, 0 );
 scene.add( hemiLight );
@@ -22,9 +27,6 @@ const camera = new THREE.PerspectiveCamera( 50, ratContainerWidth / ratContainer
 camera.position.z = 3;
 camera.position.y = 0.5;
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( ratContainerWidth, ratContainerHeight );
-renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const controls = new OrbitControls( camera, renderer.domElement );
 controls.target.set( 0, 0.5, 0 );
