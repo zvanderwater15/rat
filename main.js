@@ -7,8 +7,6 @@ let headerHeight = document.getElementById("title").offsetHeight;
 let ratContainerWidth = ratContainer.offsetWidth;
 let ratContainerHeight = window.innerHeight - (headerHeight * 2);
 
-console.log(ratContainerHeight);
-
 const renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setClearColor( 0x000000, 0 ); // the default
 renderer.setSize( ratContainerWidth, ratContainerHeight );
@@ -38,19 +36,31 @@ ratContainer.appendChild( renderer.domElement );
 
 const loader = new GLTFLoader();
 const clock = new THREE.Clock();
-let mixer;
+let mixers = [];
 
-loader.load( '/rat/rat.glb', function ( gltf ) {
-    const model = gltf.scene;
-	scene.add( model );
-    mixer = new THREE.AnimationMixer( model );
-    const animations = ["idle", "walk", "attack", "hit"];
-    mixer.clipAction( gltf.animations[ 0 ] ).play();
-    mixer.timeScale = 4/5 ;
-    animate();
-}, undefined, function ( error ) {
-	console.error( error );
-} );
+/*
+animations = ["idle", "walk", "attack", "hit"]
+*/
+function ratLoader(scene, mixers, scale, position, animationIndex) {
+    loader.load( '/rat/rat.glb', function ( gltf ) {
+        const model = gltf.scene;
+        model.position.setY(position);
+        scene.add( model );
+        const mixer = new THREE.AnimationMixer( model );
+        model.scale.set(scale, scale, scale);     
+        mixer.clipAction( gltf.animations[ animationIndex ] ).play();
+        mixer.timeScale = 4/5 ;
+        mixers.push(mixer);
+        console.log("yeah we loading")
+        animate();
+    }, undefined, function ( error ) {
+        console.error( error );
+    } );   
+}
+
+ratLoader(scene, mixers, 1, 0, 0);
+ratLoader(scene, mixers, 0.25, 0.38, 2);
+ratLoader(scene, mixers, 0.05, 0.48, 3);
 
 window.onresize = function () {
     headerHeight = document.getElementById("title").offsetHeight;
@@ -60,21 +70,18 @@ window.onresize = function () {
     camera.updateProjectionMatrix();
 
     renderer.setSize( ratContainerWidth, ratContainerHeight );
-
 };
 
 function animate() {
     requestAnimationFrame( animate );
     const delta = clock.getDelta();
-    mixer.update( delta );
+    for (let mixer of mixers) {
+        mixer.update( delta );
+    }
     controls.update();
     renderer.render(scene, camera);
 }
 
 
-// const geometry = new THREE.BoxGeometry( 1, 1, 1);
-// const material = new THREE.MeshBasicMaterial({color: 0xFFFFFF});
-// const cube = new THREE.Mesh( geometry, material);
-// scene.add( cube );
 
 
